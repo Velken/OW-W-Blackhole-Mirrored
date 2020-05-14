@@ -1,0 +1,710 @@
+variables
+{
+	global:
+		0: Position
+		1: Radius
+		2: Height
+		3: Config
+		4: Ab1H
+		5: UltH
+		6: Ab2H
+		26: RANDOMHERO
+
+	player:
+		0: KnockbackProof
+}
+
+subroutines
+{
+	0: EndR
+}
+
+rule("Run from Blackhole by Rosen#11232 and MercyTraider#1662. Grab the latest code here: workshop.codes/blackhole")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Inspector Recording;
+		Create HUD Text(All Players(All Teams), Null, Custom String("Based on run from black hole by Rosen#11232 and MercyTraider#1662",
+			Null, Null, Null), Null, Right, -1, White, White, White, Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Custom String("Modified by ya boy SugarTips and her mum TyreenBeefstock", Null, Null,
+			Null), Null, Right, 0, White, White, White, Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Custom String("Mirror Mode by Velken#1633", Null, Null, Null), Null, Right, 0, White,
+			White, White, Visible To and String, Default Visibility);
+		Set Global Variable(Position, 0);
+	}
+}
+
+rule("Configurations || FEEL FREE TO EDIT THESE VALUES TO FIT YOUR PLAYSTYLES.")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		"Set the rate at which the black hole grows each second (Default: 1.25)"
+		Set Global Variable At Index(Config, 0, 1.750);
+		"TRUE: Black hole will grow more when a player gets eaten"
+		Set Global Variable At Index(Config, 1, True);
+		"TRUE: Punching will have knockback"
+		Set Global Variable At Index(Config, 2, True);
+		"The amount at which the black hole grows each time someone gets eaten (Default: 3)"
+		Set Global Variable At Index(Config, 3, 3);
+		"TRUE: Black hole will also grow in height (Experimental, enable if you wish)"
+		Set Global Variable At Index(Config, 4, False);
+		"TRUE: Specific heroes will receive pull resistance while using abilities"
+		Set Global Variable At Index(Config, 5, True);
+		"The rate at which the black hole pulls players in (Default: 15)"
+		Set Global Variable At Index(Config, 6, 18);
+		"The amount of impulse the punch does on the victim (Default: 8)"
+		Set Global Variable At Index(Config, 7, 32);
+		"Wall Spacing: Actual spacing is double this value (Default: 7.5)"
+		Set Global Variable At Index(Config, 8, 7.500);
+		"TRUE: The laser beams will deal damage and inflict stun when touched."
+		Set Global Variable At Index(Config, 9, True);
+	}
+}
+
+rule("Is assembling")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(3);
+		Set Global Variable(Position, Vector(450, 8, 0));
+		Set Global Variable(Radius, 0);
+		Set Player Variable(All Players(All Teams), KnockbackProof, False);
+	}
+}
+
+rule("Create effects and initialize variables")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(Position, Vector(450, 8, 0));
+		disabled Set Global Variable(Position, Vector(0, Global Variable(Height), 0));
+		Create Effect(All Players(All Teams), Bad Aura, Purple, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Bad Aura, Blue, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Bad Aura, Sky Blue, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, Purple, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, Blue, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, Red, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, White, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, Yellow, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, Aqua, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Good Aura, Purple, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Good Aura, Blue, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Good Aura, Red, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Good Aura, Orange, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Sparkles, Orange, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Create Effect(All Players(All Teams), Bad Aura Sound, Purple, Global Variable(Position), Global Variable(Radius),
+			Visible To Position and Radius);
+		Set Global Variable(Radius, 0);
+		disabled Set Global Variable(Height, 5);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Vector(-450, 1, Subtract(0, Add(Value In Array(Global Variable(Config), 8),
+			0.250))), Vector(450, 1, Subtract(0, Add(Value In Array(Global Variable(Config), 8), 0.250))), Red,
+			Visible To Position and Radius);
+		Create Beam Effect(All Players(All Teams), Bad Beam, Vector(-450, 1, Add(Value In Array(Global Variable(Config), 8), 0.250)),
+			Vector(450, 1, Add(Value In Array(Global Variable(Config), 8), 0.250)), Red, Visible To Position and Radius);
+	}
+}
+
+rule("Start round and chase radius")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("Black hole will grow in 5 seconds!", Null, Null, Null));
+		Set Global Variable(RANDOMHERO, Randomized Array(Allowed Heroes(All Players(All Teams))));
+		Wait(2, Ignore Condition);
+		Big Message(All Players(All Teams), Custom String("3", Null, Null, Null));
+		Wait(1, Ignore Condition);
+		Big Message(All Players(All Teams), Custom String("2", Null, Null, Null));
+		Wait(1, Ignore Condition);
+		Big Message(All Players(All Teams), Custom String("1", Null, Null, Null));
+		Wait(1, Ignore Condition);
+		Big Message(All Players(All Teams), Custom String("Run!!!", Null, Null, Null));
+		Chase Global Variable At Rate(Radius, 1000, Value In Array(Global Variable(Config), 0), Destination and Rate);
+		Skip If(Compare(Value In Array(Global Variable(Config), 4), ==, False), 1);
+		Chase Global Variable At Rate(Position, Vector(0, 500, 0), 1.250, Destination and Rate);
+	}
+}
+
+rule("Set Mirror Random to all players")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Global Variable(RANDOMHERO));
+	}
+}
+
+rule("Damage while in black hole")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Global Variable(Position)) <= Global Variable(Radius);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		disabled Start Damage Over Time(Event Player, Null, 9999, Multiply(Global Variable(Radius), 15));
+		Damage(Event Player, Null, 100);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("Stop damaging while in black hole")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Global Variable(Position)) > Global Variable(Radius);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop All Damage Over Time(Event Player);
+	}
+}
+
+rule("Black hole's impulse")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, KnockbackProof) == False;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Direction Towards(Event Player, Global Variable(Position)), Multiply(Divide(1, Distance Between(
+			Global Variable(Position), Event Player)), Multiply(Global Variable(Radius), Value In Array(Global Variable(Config), 6))),
+			To World, Incorporate Contrary Motion);
+		Wait(0.020, Ignore Condition);
+		Loop If Condition Is True;
+		disabled Start Throttle In Direction(Event Player, Global Variable(Position), Divide(Global Variable(Radius), 0), To World,
+			Replace existing throttle, Direction and Magnitude);
+		disabled Start Accelerating(Event Player, Direction Towards(Event Player, Global Variable(Position)), Multiply(2.500, Global Variable(
+			Radius)), 60, To World, Direction Rate and Max Speed);
+	}
+}
+
+rule("Diasble respawning")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Disable Built-In Game Mode Respawning(Event Player);
+		Enable Death Spectate All Players(Event Player);
+		Enable Death Spectate Target HUD(Event Player);
+		Wait(1, Ignore Condition);
+		Disable Built-In Game Mode Respawning(Event Player);
+		Enable Death Spectate All Players(Event Player);
+		Enable Death Spectate Target HUD(Event Player);
+	}
+}
+
+rule("End round if alive and player count >=1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(All Players(All Teams), And(Compare(Has Spawned(Current Array Element), ==, True), Compare(Is Alive(
+			Current Array Element), ==, True)))) <= 1;
+		Count Of(Filtered Array(All Players(All Teams), Compare(Has Spawned(Current Array Element), ==, True))) >= 2;
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Player Score(Event Player, 5);
+		Big Message(All Players(All Teams), String("{0} {1}", Event Player, Custom String("has won the round!", Null, Null, Null), Null));
+		Start Rule(EndR, Restart Rule);
+	}
+}
+
+rule("End round subroutine")
+{
+	event
+	{
+		Subroutine;
+		EndR;
+	}
+
+	actions
+	{
+		Stop Chasing Global Variable(Position);
+		Stop Chasing Global Variable(Radius);
+		Set Slow Motion(15);
+		Wait(1, Ignore Condition);
+		Set Slow Motion(100);
+		Go To Assemble Heroes;
+		Stop Forcing Player To Be Hero(Event Player);
+	}
+}
+
+rule("Disable gamemode mechanics")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Announcer;
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Music;
+		Disable Built-In Game Mode Scoring;
+	}
+}
+
+rule("Initiate players")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Respawn(Event Player);
+		Set Damage Dealt(Event Player, 0.100);
+		"Randomly place players near blackhole"
+		Teleport(Event Player, Nearest Walkable Position(Vector(Random Real(300, 350), 0, Random Real(Subtract(0, Value In Array(
+			Global Variable(Config), 8)), Value In Array(Global Variable(Config), 8)))));
+	}
+}
+
+disabled rule("Grow height")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Global Variable(Radius) != 0;
+		Value In Array(Global Variable(Config), 4) == True;
+	}
+
+	actions
+	{
+		disabled Modify Global Variable(Position, Add, Vector(0, 0.250, 0));
+		disabled Wait(0.200, Ignore Condition);
+		disabled Loop If Condition Is True;
+		Chase Global Variable At Rate(Position, Vector(0, 500, 0), 1.250, Destination and Rate);
+	}
+}
+
+disabled rule("Apply impulse when punch (for non-melee characters)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Melee) == True;
+		Hero Of(Event Player) != Hero(Brigitte);
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Value In Array(Global Variable(Config), 2) == True;
+		Is Firing Primary(Event Player) == False;
+		Is Firing Secondary(Event Player) == False;
+		Is Using Ultimate(Event Player) == False;
+		Is Using Ability 1(Event Player) == False;
+		Is Using Ability 2(Event Player) == False;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Add(Facing Direction Of(Event Player), Up), Value In Array(Global Variable(Config), 7), To World,
+			Cancel Contrary Motion);
+	}
+}
+
+disabled rule("Apply impulse when punch (for melee characters)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+		Or(Compare(Hero Of(Event Player), ==, Hero(Brigitte)), Compare(Hero Of(Event Player), ==, Hero(Reinhardt))) == True;
+		Value In Array(Global Variable(Config), 2) == True;
+		Is Using Ultimate(Event Player) == False;
+		Is Using Ability 1(Event Player) == False;
+		Is Using Ability 2(Event Player) == False;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Add(Facing Direction Of(Event Player), Up), Value In Array(Global Variable(Config), 7), To World,
+			Cancel Contrary Motion);
+	}
+}
+
+rule("Blackhole grows when someone gets eaten")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Event Player, Global Variable(Position)) <= Global Variable(Radius);
+		Has Spawned(Event Player) == True;
+		Value In Array(Global Variable(Config), 1) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(Radius, Add, Value In Array(Global Variable(Config), 5));
+	}
+}
+
+rule("Using ability 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+		Is True For Any(Global Variable(Ab1H), Compare(Hero Of(Event Player), ==, Current Array Element)) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, KnockbackProof, True);
+	}
+}
+
+rule("Using ability 1 (False)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == False;
+		Is True For Any(Global Variable(Ab1H), Compare(Hero Of(Event Player), ==, Current Array Element)) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, KnockbackProof, False);
+	}
+}
+
+rule("Using ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+		Is True For Any(Global Variable(UltH), Compare(Hero Of(Event Player), ==, Current Array Element)) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, KnockbackProof, True);
+	}
+}
+
+rule("Using ultimate (False)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == False;
+		Is True For Any(Global Variable(UltH), Compare(Hero Of(Event Player), ==, Current Array Element)) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, KnockbackProof, False);
+	}
+}
+
+rule("Using ability 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+		Is True For Any(Global Variable(Ab2H), Compare(Hero Of(Event Player), ==, Current Array Element)) == True;
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, KnockbackProof, True);
+	}
+}
+
+rule("Using ability 2 (False)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 2(Event Player) == False;
+		Is True For Any(Global Variable(Ab2H), Compare(Hero Of(Event Player), ==, Current Array Element)) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, KnockbackProof, False);
+	}
+}
+
+rule("Set heroes arrays")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(Config), 5) == True;
+	}
+
+	actions
+	{
+		Set Global Variable At Index(Ab1H, 0, Hero(Zarya));
+		Modify Global Variable(Ab1H, Append To Array, Hero(Orisa));
+		Modify Global Variable(Ab1H, Append To Array, Hero(Mei));
+		Modify Global Variable(Ab1H, Append To Array, Hero(Sigma));
+		Modify Global Variable(Ab1H, Append To Array, Hero(McCree));
+		Set Global Variable At Index(UltH, 0, Hero(Ana));
+		Modify Global Variable(UltH, Append To Array, Hero(Baptiste));
+		Modify Global Variable(UltH, Append To Array, Hero(Bastion));
+		Modify Global Variable(UltH, Append To Array, Hero(McCree));
+		Modify Global Variable(UltH, Append To Array, Hero(Torbjörn));
+		Modify Global Variable(UltH, Append To Array, Hero(Orisa));
+		Modify Global Variable(UltH, Append To Array, Hero(Junkrat));
+		Modify Global Variable(UltH, Append To Array, Hero(Torbjörn));
+		Modify Global Variable(UltH, Append To Array, Hero(Reaper));
+		Modify Global Variable(UltH, Append To Array, Hero(Hanzo));
+		Modify Global Variable(UltH, Append To Array, Hero(Symmetra));
+		Modify Global Variable(UltH, Append To Array, Hero(Widowmaker));
+		Set Global Variable At Index(Ab2H, 0, Hero(Echo));
+		Modify Global Variable(Ab2H, Append To Array, Hero(Wrecking Ball));
+		Modify Global Variable(UltH, Append To Array, Hero(Mercy));
+	}
+}
+
+rule("Wall A")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Z Component Of(Position Of(Event Player)) >= Z Component Of(Vector(0, 0, Value In Array(Global Variable(Config), 8)));
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Vector(0, 1, -1), 10, To World, Cancel Contrary Motion);
+		If(Value In Array(Global Variable(Config), 9));
+			Set Status(Event Player, Null, Stunned, 0.200);
+			Damage(Event Player, Null, 25);
+		Else;
+			Set Status(Event Player, Null, Rooted, 0.200);
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Wall B")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Z Component Of(Position Of(Event Player)) <= Z Component Of(Vector(0, 0, Subtract(0, Value In Array(Global Variable(Config), 8))));
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Vector(0, 1, 1), 10, To World, Cancel Contrary Motion);
+		If(Value In Array(Global Variable(Config), 9));
+			Set Status(Event Player, Null, Stunned, 0.200);
+			Damage(Event Player, Null, 25);
+		Else;
+			Set Status(Event Player, Null, Rooted, 0.200);
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
